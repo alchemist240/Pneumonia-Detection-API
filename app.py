@@ -22,6 +22,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Global model variable (lazy loading)
 model = None
+model_load_error = None  # ✅ Store error message if model fails to load
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -29,14 +30,22 @@ def allowed_file(filename):
 
 def load_pneumonia_model():
     """Load the pneumonia detection model once"""
-    global model
+    global model, model_load_error
     if model is None:
         try:
+            print("🔄 Checking model file...")
+            if not os.path.exists(MODEL_PATH):
+                model_load_error = f"❌ Model file not found: {MODEL_PATH}"
+                print(model_load_error)
+                return None
+            
             print("🔄 Loading pneumonia model...")
             model = tf.keras.models.load_model(MODEL_PATH, compile=False)
             print("✅ Model loaded successfully!")
+            model_load_error = None  # Clear error on successful load
         except Exception as e:
-            print(f"❌ Error loading model: {e}")
+            model_load_error = f"❌ Error loading model: {e}"
+            print(model_load_error)
             model = None
     return model
 
@@ -46,6 +55,8 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "model_loaded": model is not None,
+        "model_status": "Loaded" if model is not None else "Not Loaded",
+        "model_error": model_load_error if model_load_error else "None",
         "timestamp": datetime.datetime.now().isoformat()
     })
 
@@ -98,7 +109,7 @@ def predict():
             load_pneumonia_model()
 
         if model is None:
-            return jsonify({"error": "Model failed to load"}), 500
+            return jsonify({"error": "Model failed to load", "model_error": model_load_error}), 500
 
         # Make prediction
         prediction = model.predict(img)
