@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input
 from tensorflow.keras.mixed_precision import Policy  # ✅ Correct import
 from keras.utils import custom_object_scope
+from tensorflow.keras.models import Model
 
 # Define paths
 OLD_MODEL_PATH = "models/cnn_best.h5"
@@ -21,9 +22,20 @@ try:
     with custom_object_scope(custom_objects):
         old_model = tf.keras.models.load_model(OLD_MODEL_PATH, compile=False)
 
+    print("🔄 Rebuilding the model architecture...")
+
+    # ✅ Recreate the model using the same architecture
+    inputs = old_model.input  # Get input layer
+    outputs = old_model.outputs  # Get output layer
+    new_model = Model(inputs=inputs, outputs=outputs, name="rebuilt_model")
+
+    # ✅ Copy weights to the new model
+    new_model.set_weights(old_model.get_weights())
+    print("✅ Model architecture rebuilt successfully!")
+
     # ✅ Save as HDF5 format first (fix compatibility)
     print("💾 Saving intermediate HDF5 model...")
-    old_model.save(INTERMEDIATE_MODEL_PATH, save_format="h5")
+    new_model.save(INTERMEDIATE_MODEL_PATH, save_format="h5")
 
     # ✅ Reload from HDF5 (ensures proper format)
     print("🔄 Reloading from HDF5 model...")
@@ -33,7 +45,7 @@ try:
     print("💾 Saving final .keras model...")
     fixed_model.save(NEW_MODEL_PATH, save_format="keras")
 
-    print("✅ Model converted successfully!")
+    print("✅ Model converted and rebuilt successfully!")
 
 except Exception as e:
     print(f"❌ Error during conversion: {e}")
