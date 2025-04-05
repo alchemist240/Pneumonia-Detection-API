@@ -8,7 +8,7 @@ import os
 
 # Define paths
 OLD_MODEL_PATH = "models/cnn_best.h5"
-NEW_MODEL_PATH = "models/cnn_best_fixed.keras"
+SAVED_MODEL_DIR = "models/cnn_saved_model"
 
 tf.get_logger().setLevel('INFO')  # ✅ Cleaner TensorFlow logging
 
@@ -26,8 +26,8 @@ try:
     }
 
     with custom_object_scope(custom_objects):
-        old_model = load_model(OLD_MODEL_PATH, compile=False)  # ✅ Ensure compilation
-    
+        old_model = load_model(OLD_MODEL_PATH, compile=False)
+
     print("✅ Model loaded successfully!")
 
     # ✅ Clone model structure and transfer weights
@@ -43,15 +43,15 @@ try:
 
     print("✅ Weights verified successfully!")
 
-    # ✅ Save final model in `.keras` format
-    print("💾 Saving final `.keras` model...")
-    new_model.save(NEW_MODEL_PATH, save_format="keras")
-    print(f"🎉 Model successfully saved at: {NEW_MODEL_PATH}")
+    # ✅ Save final model in SavedModel format (directory-based)
+    print("💾 Saving final model in SavedModel format...")
+    new_model.save(SAVED_MODEL_DIR)  # ✅ SavedModel = safe, platform-friendly
+    print(f"🎉 Final model saved successfully at: {SAVED_MODEL_DIR}")
 
-    # ✅ Verify the final model loads correctly
-    print("📥 Reloading final `.keras` model for verification...")
-    final_model = load_model(NEW_MODEL_PATH, compile=False)
-    print("✅ Final model loaded successfully!")
+    # ✅ Reload for verification
+    print("📥 Verifying saved model by reloading it...")
+    final_model = tf.keras.models.load_model(SAVED_MODEL_DIR, compile=False)
+    print("✅ Final model loaded successfully from SavedModel directory!")
 
 except Exception as e:
     print(f"❌ Error during conversion: {e}")

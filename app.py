@@ -17,7 +17,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 # Configuration
-MODEL_PATH = os.path.join('models', 'cnn_best_fixed.keras')  # ✅ Updated model path
+MODEL_PATH = "models/cnn_saved_model" # ✅ Updated model path
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'tiff', 'dcm'}
 
