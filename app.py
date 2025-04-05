@@ -2,11 +2,15 @@ from flask import Flask, request, jsonify, send_from_directory
 import os
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras import mixed_precision
 from utils.preprocessor import preprocess_image
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import uuid
 import datetime
+
+
+mixed_precision.set_global_policy('mixed_float16')
 
 # Initialize Flask app
 app = Flask(__name__)
