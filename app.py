@@ -45,7 +45,7 @@ def load_pneumonia_model():
             
             print(f"🔥 TensorFlow version: {tf.__version__}")
             print("🔄 Loading pneumonia model...")
-            model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+            model = tf.keras.models.load_model(MODEL_PATH, compile=True)
             print("✅ Model loaded successfully!")
             model_load_error = None  # Clear error on successful load
         except Exception as e:
