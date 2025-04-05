@@ -44,6 +44,9 @@ def load_pneumonia_model():
                 return None
             
             print(f"🔥 TensorFlow version: {tf.__version__}")
+            print(f"🔄 Checking model file...")
+            print(f"📁 Model path: {MODEL_PATH}")
+            print(f"📂 Model file exists: {os.path.exists(MODEL_PATH)}")  # ✅ ADD THIS LINE
             print("🔄 Loading pneumonia model...")
             model = tf.keras.models.load_model(MODEL_PATH, compile=True)
             print("✅ Model loaded successfully!")
