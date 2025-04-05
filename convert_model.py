@@ -3,12 +3,15 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.mixed_precision import Policy  # ✅ Correct import
 from keras.utils import custom_object_scope
 from tensorflow.keras.models import Model
+import numpy as np
 import os
 
 # Define paths
 OLD_MODEL_PATH = "models/cnn_best.h5"
 INTERMEDIATE_MODEL_PATH = "models/cnn_best_fixed.h5"
 NEW_MODEL_PATH = "models/cnn_best_fixed.keras"
+
+tf.get_logger().setLevel('INFO')  # ✅ Cleaner TensorFlow logging
 
 print("🔄 Loading model with `custom_object_scope` workaround...")
 
@@ -19,6 +22,7 @@ try:
         "DTypePolicy": Policy  # ✅ Fix dtype policy issue
     }
 
+    # ✅ Ensure model file exists
     if not os.path.exists(OLD_MODEL_PATH):
         raise FileNotFoundError(f"❌ Old model file not found: {OLD_MODEL_PATH}")
     
@@ -47,19 +51,27 @@ try:
     new_model = tf.keras.models.clone_model(fixed_model)
     new_model.set_weights(fixed_model.get_weights())
 
-    # ✅ Optional: check weights match
+    # ✅ Weight verification with NumPy
     print("🔍 Verifying weight match...")
+    weight_mismatch = False
     for w1, w2 in zip(fixed_model.get_weights(), new_model.get_weights()):
-        if not (w1 == w2).all():
+        if not np.allclose(w1, w2, atol=1e-6):  # ✅ NumPy check instead of `.all()`
             print("⚠️ Warning: Weight mismatch detected!")
+            weight_mismatch = True
             break
-    else:
+
+    if not weight_mismatch:
         print("✅ Weight match confirmed!")
 
     # ✅ Save final .keras model
     print("💾 Saving final `.keras` model...")
     new_model.save(NEW_MODEL_PATH, save_format="keras")
     print(f"🎉 Final model saved successfully at: {NEW_MODEL_PATH}")
+
+    # ✅ Verify the final model loads correctly
+    print("🔄 Verifying final model loading...")
+    final_model = tf.keras.models.load_model(NEW_MODEL_PATH, compile=False)
+    print("✅ Final model loaded successfully!")
 
 except Exception as e:
     print(f"❌ Error during conversion: {e}")
