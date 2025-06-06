@@ -1,6 +1,9 @@
 # 🫁 PneumoShield: Pneumonia Detection API using Flask & Deep Learning
 
 PneumoShield is an AI-powered Flask API that detects **pneumonia** from chest X-ray images using pre-trained convolutional neural networks. Built as part of a semester mini-project, it integrates machine learning with a modern MERN/Next.js frontend to provide real-time diagnostic assistance.
+I have also integrated this Working models on my complete project of pneumonia detection.
+
+Link of working project - https://pneumoshield.vercel.app/
 
 ---
 
